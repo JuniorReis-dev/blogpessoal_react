@@ -1,4 +1,3 @@
-import React from "react";
 import { LinkedinLogo, GithubLogo } from "@phosphor-icons/react";
 
 export default function Footer() {
