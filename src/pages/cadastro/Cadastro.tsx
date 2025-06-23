@@ -1,6 +1,67 @@
+import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
 import "./Cadastro.css";
+import type Usuario from "../../models/Usuario";
+import { useNavigate } from "react-router-dom";
+import { RotatingLines } from "react-loader-spinner";
+import { cadastrarUsuario } from "../../services/Service";
 
 function Cadastro() {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [confirmarSenha, setConfirmarSenha] = useState<string>("");
+
+  const [usuario, setUsuario] = useState<Usuario>({
+    id: 0,
+    nome: "",
+    usuario: "",
+    senha: "",
+    foto: "",
+  });
+
+  useEffect(() => {
+    if (usuario.id !== 0) {
+      retornar();
+    }
+  }, [usuario]);
+  function retornar() {
+    navigate("/login");
+  }
+
+  function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
+    setUsuario({
+      ...usuario,
+      [e.target.name]: e.target.value,
+    });
+  }
+  function handleConfirmarSenha(e: ChangeEvent<HTMLInputElement>) {
+    setConfirmarSenha(e.target.value);
+  }
+  async function cadastrarNovoUsuario(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (confirmarSenha === usuario.senha && usuario.senha.length >= 8) {
+      setIsLoading(true);
+
+      try {
+        await cadastrarUsuario("/usuarios/cadastrar", usuario, setUsuario);
+        ToastAlerta("Usuário Cadastrado com sucesso!", "sucesso");
+      } catch (error) {
+        ToastAlerta("Erro ao cadastrar o Usuário!", "erro");
+      }
+    } else {
+      ToastAlerta(
+        "Dados do usuário inconsistentes! Verifique as informações e tente novamente.",
+        "erro"
+      );
+      setUsuario({ ...usuario, senha: "" });
+      setConfirmarSenha("");
+    }
+
+    setIsLoading(false);
+  }
+
+  console.log(JSON.stringify(usuario));
+  console.log(confirmarSenha);
   return (
     <>
       <div
@@ -8,7 +69,10 @@ function Cadastro() {
             place-items-center font-bold"
       >
         <div className="fundoCadastro hidden lg:block"></div>
-        <form className="flex justify-center items-center flex-col w-2/3 gap-3">
+        <form
+          className="flex justify-center items-center flex-col w-2/3 gap-3"
+          onSubmit={cadastrarNovoUsuario}
+        >
           <h2 className="text-slate-900 text-5xl">Cadastrar</h2>
           <div className="flex flex-col w-full">
             <label htmlFor="nome">Nome</label>
@@ -18,6 +82,10 @@ function Cadastro() {
               name="nome"
               placeholder="Nome"
               className="border-2 border-slate-700 rounded p-2"
+              value={usuario.nome}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                atualizarEstado(e)
+              }
             />
           </div>
           <div className="flex flex-col w-full">
@@ -28,6 +96,10 @@ function Cadastro() {
               name="usuario"
               placeholder="Usuario"
               className="border-2 border-slate-700 rounded p-2"
+              value={usuario.usuario}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                atualizarEstado(e)
+              }
             />
           </div>
           <div className="flex flex-col w-full">
@@ -38,6 +110,10 @@ function Cadastro() {
               name="foto"
               placeholder="Foto"
               className="border-2 border-slate-700 rounded p-2"
+              value={usuario.foto}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                atualizarEstado(e)
+              }
             />
           </div>
           <div className="flex flex-col w-full">
@@ -48,6 +124,10 @@ function Cadastro() {
               name="senha"
               placeholder="Senha"
               className="border-2 border-slate-700 rounded p-2"
+              value={usuario.senha}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                atualizarEstado(e)
+              }
             />
           </div>
           <div className="flex flex-col w-full">
@@ -58,12 +138,17 @@ function Cadastro() {
               name="confirmarSenha"
               placeholder="Confirmar Senha"
               className="border-2 border-slate-700 rounded p-2"
+              value={confirmarSenha}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                handleConfirmarSenha(e)
+              }
             />
           </div>
           <div className="flex justify-around w-full gap-8">
             <button
               type="reset"
               className="rounded text-white bg-red-400 hover:bg-red-700 w-1/2 py-2"
+              onClick={retornar}
             >
               Cancelar
             </button>
@@ -74,7 +159,17 @@ function Cadastro() {
                           hover:bg-indigo-900 w-1/2 py-2
                             flex justify-center"
             >
-              Cadastrar
+              {isLoading ? (
+                <RotatingLines
+                  strokeColor="white"
+                  strokeWidth="5"
+                  animationDuration="0.75"
+                  width="24"
+                  visible={true}
+                />
+              ) : (
+                <span>Cadastrar</span>
+              )}
             </button>
           </div>
         </form>
@@ -84,3 +179,6 @@ function Cadastro() {
 }
 
 export default Cadastro;
+function ToastAlerta(arg0: string, arg1: string) {
+  throw new Error("Function not implemented.");
+}
