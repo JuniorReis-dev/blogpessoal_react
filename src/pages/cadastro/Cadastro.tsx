@@ -1,14 +1,15 @@
-import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import "./Cadastro.css";
 import type Usuario from "../../models/Usuario";
 import { useNavigate } from "react-router-dom";
-import { RotatingLines } from "react-loader-spinner";
 import { cadastrarUsuario } from "../../services/Service";
+import { RotatingLines } from "react-loader-spinner";
 
 function Cadastro() {
   const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [confirmarSenha, setConfirmarSenha] = useState<string>("");
+  const [confirmaSenha, setConfirmaSenha] = useState<string>("");
 
   const [usuario, setUsuario] = useState<Usuario>({
     id: 0,
@@ -23,6 +24,7 @@ function Cadastro() {
       retornar();
     }
   }, [usuario]);
+
   function retornar() {
     navigate("/login");
   }
@@ -33,35 +35,41 @@ function Cadastro() {
       [e.target.name]: e.target.value,
     });
   }
+
   function handleConfirmarSenha(e: ChangeEvent<HTMLInputElement>) {
-    setConfirmarSenha(e.target.value);
+    setConfirmaSenha(e.target.value);
   }
+
   async function cadastrarNovoUsuario(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (confirmarSenha === usuario.senha && usuario.senha.length >= 8) {
+    if (confirmaSenha === usuario.senha && usuario.senha.length >= 8) {
       setIsLoading(true);
 
       try {
         await cadastrarUsuario("/usuarios/cadastrar", usuario, setUsuario);
-        ToastAlerta("Usuário Cadastrado com sucesso!", "sucesso");
+        alert("Usuário cadastrado com sucesso!");
       } catch (error) {
-        ToastAlerta("Erro ao cadastrar o Usuário!", "erro");
+        alert("Erro ao cadastrar o usuário");
+        console.error(error);
       }
     } else {
-      ToastAlerta(
-        "Dados do usuário inconsistentes! Verifique as informações e tente novamente.",
-        "erro"
+      alert(
+        "Dados do usuário inconsistentes! Verifique as informações do cadastro"
       );
-      setUsuario({ ...usuario, senha: "" });
-      setConfirmarSenha("");
+      setUsuario({
+        ...usuario,
+        senha: "",
+      });
+      setConfirmaSenha("");
     }
 
     setIsLoading(false);
   }
 
   console.log(JSON.stringify(usuario));
-  console.log(confirmarSenha);
+  console.log(confirmaSenha);
+
   return (
     <>
       <div
@@ -138,7 +146,7 @@ function Cadastro() {
               name="confirmarSenha"
               placeholder="Confirmar Senha"
               className="border-2 border-slate-700 rounded p-2"
-              value={confirmarSenha}
+              value={confirmaSenha}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 handleConfirmarSenha(e)
               }
@@ -154,10 +162,9 @@ function Cadastro() {
             </button>
             <button
               type="submit"
-              className="rounded text-white
-                          bg-indigo-400
-                          hover:bg-indigo-900 w-1/2 py-2
-                            flex justify-center"
+              className="rounded text-white bg-indigo-400
+                           hover:bg-indigo-900 w-1/2 py-2
+                           flex justify-center"
             >
               {isLoading ? (
                 <RotatingLines
@@ -179,6 +186,3 @@ function Cadastro() {
 }
 
 export default Cadastro;
-function ToastAlerta(arg0: string, arg1: string) {
-  throw new Error("Function not implemented.");
-}
