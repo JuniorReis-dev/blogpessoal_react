@@ -31,7 +31,7 @@ function Home() {
                     font-bold
                 "
           >
-            Seja Bem Vinde!
+            Seja Bem Vindo!
           </h2>
           <p className="text-xl">Expresse aqui seus pensamentos e opiniões</p>
           <div
