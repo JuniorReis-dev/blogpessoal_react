@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { buscar } from "../../../services/Service";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { ToastToastAlerta } from "../../../uttils/ToastAlert";
 
 function ListaTemas() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ function ListaTemas() {
   }
   useEffect(() => {
     if (token === "") {
-      ToastAlerta("Você precisa estar logado!", "info");
+      ToastToastAlerta("Você precisa estar logado!", "info");
       navigate("/");
     }
   }, [token]);
@@ -55,7 +56,7 @@ function ListaTemas() {
       )}
       <div className="flex justify-center w-full my-4">
         <div className="container flex flex-col mx-2">
-          {(!isLoading && temas.length === 0) && (
+          {!isLoading && temas.length === 0 && (
             <span className="text-3xl text-center my-8">
               Nenhum Tema foi encontrado!
             </span>
@@ -77,7 +78,3 @@ function ListaTemas() {
   );
 }
 export default ListaTemas;
-
-function ToastAlerta(arg0: string, arg1: string) {
-  throw new Error("Function not implemented.");
-}
